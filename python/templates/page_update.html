@@ -1,0 +1,9 @@
+{% import 'page_widgets.html' as Widget %}
+{%- if page.TITLE -%}
+{{page.TITLE.HTML()|safe}}
+{%- endif -%}
+{{ Widget.Message(page.MESSAGE) }}
+{% for widget in page.WIDGETS %}
+{{ Widget.Widget(widget)}}
+{% endfor %}
+

@@ -1,0 +1,3 @@
+{"version": "11.7.0", "id": "discount", "short_name" : "Дисконтный сервер", "run_type":"login",
+    "description" : "Дисконтный сервер", "grant_module_id":"discount"
+}

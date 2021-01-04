@@ -1,0 +1,429 @@
+{% import 'page_widgets.html' as Widget %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{page.TITLE}}</title>
+
+{%- if page.FRAMEWORK == 'MDL' -%}
+    <!-- MATERIAL DESIGN LITE -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!--link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue_grey-blue.min.css"-->
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue-red.min.css" />
+    <!--link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css"-->
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <!-- BOOTSTRAP 4 -->
+    <!--link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"-->
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+    <!--link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script-->
+    
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+      a {font-weight: normal}
+    </style>
+  
+{%- elif page.FRAMEWORK == 'MB' -%}
+     <!-- MATERIAL DESIGN FOR BOOTSTRAP -->
+     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css">
+     <link href="/domino/active/web/MDB-Free_4.7.3/css/bootstrap.min.css" rel="stylesheet">
+     <link href="/domino/active/web/MDB-Free_4.7.3/css/mdb.min.css" rel="stylesheet">
+     <link href="/domino/active/web/MDB-Free_4.7.3/css/style.css" rel="stylesheet">
+
+{%- else -%}
+    <!-- BOOTSTRAP 4 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+{%- endif -%}
+    <script>
+      var PROCESSING = false
+      function start_processing(url) 
+      { 
+        let PROCESSING = true;
+        console.log('start_processing ' + PROCESSING + ' ' + url)
+      
+      }
+      function stop_processing(url) 
+      { 
+        let PROCESSING = false;
+        console.log('stop_processing ' + PROCESSING + ' ' + url)
+      }
+      function check_processing(url)
+      {
+        console.log('check_processiog ' + PROCESSING + ' ' + url)
+        return PROCESSING
+      }
+      function page_refresh()
+      {
+        console.log('refresh', location.pathname + '&refresh=yes')
+        location.replace(location.href)
+      }
+      var ttimer_id = setInterval(page_refresh, 3600000);
+
+      //$(window).focus(function() {
+        //console.log('focus ', document.hidden, location.pathname);
+        //alert('focus')
+        //ttimer_id = setInterval(page_refresh, 1000)
+      //});
+
+      //$(window).blur(function() {
+        //console.log('blur ', document.hidden, location.pathname);
+        //alert('blur') 
+        //clearInterval(interval_id);
+        //  interval_id = 0;
+      //});
+
+      var page_indicator_timer_id = undefined;
+      function page_indicator_show(){
+        var page_indicator = document.getElementById('page_indicator')
+        page_indicator.style.background = 'gray'
+      }
+      function page_indicator_open(){
+        var page_indicator = document.getElementById('page_indicator')
+        page_indicator.style.display = 'block'
+        page_indicator_timer_id = setTimeout(page_indicator_show, 1000)
+      }
+      function page_indicator_close(){
+        var page_indicator = document.getElementById('page_indicator')
+        page_indicator.style.display = 'none'
+        page_indicator.style.background = ''
+        clearTimeout(page_indicator_timer_id)
+      }
+      
+      function page_reload(){
+        location.reload(true)
+      }
+      function allowDrop(ev) {ev.preventDefault();}
+      function drag(ev, args)
+      {
+        ev.dataTransfer.setData('text', args)
+      }
+      function drop(ev, url)
+      {
+        var query = url
+        query += '&_pu=yes'
+        args = ev.dataTransfer.getData('text')
+        query += '&' + args
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4) {
+            update_page_content2(this.responseText)
+            }
+        }
+        xhttp.open("GET", query, true);
+        xhttp.send(); 
+      }
+      
+      function add_data(query, e)
+      {
+        if (e != undefined)
+        {
+          name = e.getAttribute('name')
+          value = e.value 
+          query.data.append(name, value)
+        }
+      }
+      function page_update_prim(url, forms) 
+      {
+        if (PROCESSING) 
+        {
+          console.log('page update print PROCESSING : ' + url);
+          return;
+        }
+        start_processing(url)
+         //alert('page_update_prim(' + url + ',' + forms +')')
+        page_before_update();
+        var query = 
+        { 
+          url : url + '&_pu=yes',
+          data : new FormData()
+        }
+        //alert('page_update_prim _ (' + url + ',' + forms +')')
+        for (var i = 0; i < forms.length; i++) 
+          {
+          form_id = forms[i]
+          add_data(query, document.getElementById(form_id))
+          $("#" + form_id + " [name]").each(function(i, elem) {
+              add_data(query, elem)
+              })
+          }
+        //alert('page_update_prim __ (' + url + ',' + forms +')')
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() 
+        {
+          if (this.readyState == 4) 
+          {
+            if (this.status === 200)
+            {
+              if (this.responseText == 'REFRESH') 
+                page_reload()
+              else 
+                update_page_content2(this.responseText)
+            }
+            page_indicator_close()
+            stop_processing(url)
+          }
+        }
+        page_indicator_open()
+        xhttp.open("POST", query.url, true);
+        //xhttp.send(); 
+        xhttp.send(query.data); 
+        //window.event.stopPropagation()
+      };
+      function update_page_content2(html)
+      {
+        template = document.getElementById("template")
+        template.innerHTML = html
+        //alert(template.innerHTML)
+        var update_elements = document.getElementsByClassName("UPDATE");
+        var uids = [];
+        for (i = 0; i < update_elements.length; i++)
+        {
+          //alert('UPDATED ELEMENT[' + i + '] = ' + update_elements[i].id)
+          uids.push(update_elements[i].id);
+        }
+        for (i = 0; i < uids.length; i++)
+        {
+          var uid = uids[i];
+          var id = uid.replace('UPDATE_','')
+          dst = document.getElementById(id)
+          src = document.getElementById(uid)
+          //alert('UPDATE ' + uid + ' ==> ' + id);
+          if (dst)
+          {
+            dst.outerHTML = src.outerHTML;
+          }
+          else
+          {
+            var pid = src.parentElement.id.replace('UPDATE_', '')
+            //pid = src.parentElement.id
+            parent = document.getElementById(pid)
+            if (parent)
+              parent.insertBefore(src, parent.firstChild);
+          }
+        }
+        template.innerHTML = '';
+        for (i = 0; i < uids.length; i++)
+        {
+          uid = uids[i];
+          //alert('uid = uids[i] ' + i + ' ' + uid);
+          e = document.getElementById(uid);
+          //alert(e + ' = getElementById(uid)');
+          if (e != null)
+          {
+            e.id = uid.replace('UPDATE_', '')
+            e.classList.remove("UPDATE");
+          }
+        }
+        //page_indicator_close()
+        setTimeout(close_div, 4000 )
+        page_after_update()
+      }
+
+      function page_update(url, forms) 
+      {
+        if (window.event.page_processed === undefined)
+        {
+          window.event.page_processed = true
+          page_update_prim(url, forms)
+        }
+      }
+      function page_new_window(event, url, forms) {
+        if (event.page_processed) return;
+        if (PROCESSING) 
+          return;
+        event.page_processed = true
+        var query = { 
+          //url : url + '&_pu=yes',
+          url : url,
+          data : new FormData()
+        }
+        for (var i = 0; i < forms.length; i++) {
+          form_id = forms[i]
+          add_data(query, document.getElementById(form_id))
+          $("#" + form_id + " [name]").each(function(i, elem) {
+              add_data(query, elem)
+            })
+        }
+        //event.stopPropagation()
+        //alert(query.url)
+        //window.open(query.url,"_self")
+        window.open(query.url)
+      };
+      function page_new_page_NEW(event, url, forms) {
+        if (check_processing(url))
+          return;
+        start_processing(url)
+        if (event.page_processed) return;
+        event.page_processed = true
+        var query = { 
+          url : url,
+          data : new FormData()
+        }
+        for (var i = 0; i < forms.length; i++) {
+          form_id = forms[i]
+          add_data(query, document.getElementById(form_id))
+          $("#" + form_id + " [name]").each(function(i, elem) {
+              add_data(query, elem)
+            })
+        }
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() 
+        {
+          if (this.readyState == 4) 
+          {
+            if (this.status === 200)
+            {
+              history.pushState(null, "", location.href);
+              console.log('history.pushState(null, , ' + location.href +')')
+              var new_page = window.open('about:blank', "_self")
+              new_page.document.write(this.responseText)
+              console.log('new document')
+            }
+            page_indicator_close()
+            stop_processing(url)
+          }
+        }
+        //page_indicator_open()
+        xhttp.open("POST", query.url, true);
+        console.log('POST ' + query.url)
+        xhttp.send(query.data); 
+        //stop_processing(query.url)
+      };
+      function page_new_page(event, url, forms) {
+        if (check_processing(url))
+          return;
+        if (event.page_processed) return;
+        event.page_processed = true
+        var query = { 
+          //url : url + '&_pu=yes',
+          url : url,
+          data : new FormData()
+        }
+        for (var i = 0; i < forms.length; i++) {
+          form_id = forms[i]
+          add_data(query, document.getElementById(form_id))
+          $("#" + form_id + " [name]").each(function(i, elem) {
+              add_data(query, elem)
+            })
+        }
+
+        //event.stopPropagation()
+        //alert(query.url)
+        //window.open(query.url,"_self")
+        start_processing(query.url)
+        console.log('OPEN6');
+        //alert(document.innerHTML)
+        //var newwin = window.open('about:blank', "_self")
+        //newwin.document.write(document.innerHTML)
+        var newwin = window.open(query.url, '_self')
+        //newwin.addEventListener('load', on_load, false);
+        //newwin = window.open(query.url)
+        //function on_load()
+        //{
+        //  console.log('ONLOAD')
+        //  alert('ONLOAD');
+        //}
+        stop_processing(query.url)
+      };
+      function page_download(event, url, forms) {
+        //alert('page_download')
+        if (event.page_processed) return;
+        event.page_processed = true
+        var query = { 
+          //url : url + '&_pu=yes',
+          url : url,
+          data : new FormData()
+        }
+        for (var i = 0; i < forms.length; i++) {
+          form_id = forms[i]
+          add_data(query, document.getElementById(form_id))
+          $("#" + form_id + " [name]").each(function(i, elem) {
+              add_data(query, elem)
+            })
+        }
+        //event.stopPropagation()
+        window.open(query.url, "_self")
+        //window.open(query.url)
+      };
+      function page_keypress(event, code, url, forms)
+      {
+        //alert('page_keypress ' + event.page_processed + ' ' + (event.page_processed === undefined))
+        //alert('page_keypress ' + event.page_processed + ' ' + (event.page_processed === undefined))
+        if (event.page_processed) return;
+          //alert('page_processed ' + code + ' ' + event.keyCode)
+        if (event.keyCode == code)
+        {
+          event.page_processed = true
+          page_update_prim(url, forms);
+            //return false;
+        }
+      }
+  
+      function close_div(id)
+      {
+        var message = document.getElementById('page_message');
+        message.style.display = "none"
+      }
+      
+      function page_before_update()
+      {
+        $('[data-toggle="tooltip"]').tooltip("hide")
+        
+      }
+      function page_after_update()
+      {
+        $('[data-toggle="tooltip"]').tooltip({delay: {show: 200, hide: 100}});
+      }
+
+      $(document).ready(page_after_update)
+     
+    </script>
+{% if ask %}
+    <script>
+    //setInterval("location.reload(true)", {{ask}}, true);
+    </script>
+{% endif %}
+  </head>
+  <!-- body -->
+  <body style="height:100vh; padding:0px; background-color: #FDFEFE  " class="d-flex flex-column">
+      <div id="template" style="display:none"></div>
+      <div id="page_indicator" style="opacity: 0.3; display:none; position: absolute; width:100%; height:100%; z-index:100;" >
+      </div>
+      <div id="page_box" style="opacity: 0.3; display:none; position: absolute; width:100%; height:100%; z-index:99;" >
+      </div>
+      <div id="page_header" style="padding:0px;">
+      {{page.NAVBAR.HTML()|safe}}
+      </div>
+      <div id="page_body" style="overflow: auto" class="flex-grow-1 p-0">
+      <div class="container">
+      {%- if page.TITLE -%}
+        {{page.TITLE.HTML()|safe}}
+      {%- endif -%}
+      {%- for widget in page.WIDGETS -%}
+      {{ Widget.Widget(widget)}}
+      {%- endfor -%}
+      </div>
+      </div>
+      <div id="page_footer" class="mt-auto">
+      {{ Widget.Message(page.MESSAGE) }}
+      </div>
+  </body>
+</html>

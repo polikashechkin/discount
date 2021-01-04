@@ -1,0 +1,376 @@
+<!-- Events -->
+{%- macro Events(wg) -%}
+{%- if wg.ONDRAG -%}
+ draggable="true" ondragstart="drag(event,'{{wg.ONDRAG.URL}}');"
+{%- endif -%}
+{%- if wg.EVENTS -%}
+{%- for name,event in wg.EVENTS.items() -%}
+{%- if name=="ondrop" -%}
+  ondrop="drop(event, '{{event.URL}}')" ondragover="allowDrop(event)"
+{%- elif name=='onkeypress' -%}
+  onkeypress="page_keypress(event, {{event.CHAR}}, '{{event.URL}}', [{{event.FORMS|join(',')}}])"
+{%- elif event.TARGET == 'NEW_WINDOW' -%}
+  {{name}}="page_new_window(event, '{{event.URL}}', [{{event.FORMS|join(',')}}]);"
+{%- elif event.TARGET == 'NEW_PAGE' -%}
+  {{name}}="page_new_page(event, '{{event.URL}}', [{{event.FORMS|join(',')}}]);"
+{%- elif event.TARGET == 'DOWNLOAD' -%}
+  {{name}}="page_download(event, '{{event.URL}}', [{{event.FORMS|join(',')}}]);"
+{%- else -%}
+  {{name}}="page_update('{{event.URL}}', [{{event.FORMS|join(',')}}]);return false"
+{%- endif -%}
+{%- endfor -%}
+{%- endif -%}
+{%- endmacro -%}
+
+<!-- Style -->
+{%- macro Style(wg) -%}
+{%- if wg.STYLE -%}
+style="{{wg.STYLE}}" 
+{%- endif -%}
+{%- endmacro -%}
+
+<!-- Class -->
+{%- macro Class(wg) -%}
+{%- if wg.CLASS -%}
+class="{{wg.CLASS}}" 
+{%- endif -%}
+{%- endmacro -%}
+
+<!-- Tooltip -->
+{%- macro Tooltip_OLD(wg) -%}
+{%- if wg.FRAMEWORK == 'MDL' -%}
+{%- if wg.TOOLTIP -%}
+<div style="-font-size:1rem; -font-family:serif" class="mdl-tooltip mdl-tooltip--large" for="{{wg.ID}}"> {{wg.TOOLTIP|safe}} </div>
+{%- endif -%}
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro Tooltip(wg) -%}
+{%- if wg.TOOLTIP -%}
+data-toggle="tooltip" data-placement="bottom" title="{{wg.TOOLTIP}}"
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro Disabled(wg) -%}
+{%- if wg.DISABLED -%}
+disabled
+{%- endif -%}
+{%- endmacro -%}
+
+<!-- DropDown -->
+{% macro DropDown(w) -%}
+<div  class="dropdown dropbottom">
+<button type="button" class="btn dropdown-toggle {{w.CLASS}}"  obclick="event.page_processed = true" {{Style(w)}} data-toggle="dropdown">{{w.TEXT}}</button>
+<div class="dropdown-menu">
+{% for i in w.WIDGETS -%}
+{%- if i.TEXT -%}
+<a class="dropdown-item {{i.CLASS}}" href="#" {{Style(i)}} {{Events(i)}}>{{i.TEXT}}</a>
+{%- else -%}
+<div class="dropdown-divider"></div>
+{%- endif -%}
+{% endfor %}
+</div>
+</div>
+{%- endmacro %}
+
+<!-- ToolbarItem -->
+{% macro ToolbarItem(item) -%}
+<div {{Class(item)}} style="-align-self:center; {{item.STYLE}}">
+{{ Widget(item.WIDGET) }}
+</div>
+{%- endmacro %}
+
+<!-- Toolbar -->
+{% macro Toolbar(toolbar) -%}
+<div id="{{toolbar.ID}}" class="d-flex {{toolbar.CLASS}}" {{Style(toolbar)}}>
+{% for wg in toolbar.WIDGETS -%}
+{{ ToolbarItem(wg) }}
+{%- endfor %}
+</div>
+{%- endmacro %}
+
+<!-- Panel --> 
+{%- macro Panel(p) -%}
+<div id="{{p.ID}}" Style="display:flex;{{p.STYLE}}">
+{%- for item in p.items -%}
+<div {{Style(item)}}>
+{%- if item.widget -%}
+{{Widget(item.widget)}}
+{%- endif -%}
+</div>
+{%- endfor -%}
+</div>
+{%- endmacro -%}
+
+<!-- Header -->
+{% macro Header(w) -%}
+<h5 id="{{w.ID}}">{{w.TEXT}}</h5>
+{%- endmacro %}
+ 
+{% macro Message(message) -%}
+{%- if message -%}
+<div id="{{message.ID}}" class="alert {{message.CLASS}}" {{Style(message)}}>
+<button type="button" class="close" onclick="close_div('{{message.ID}}')">&times;</button>
+{{message.TEXT}}
+</div>
+{%- endif -%}
+{%- endmacro %}
+
+<!-- Message  #f2f2f2 -->
+{% macro Message2(message) -%}
+{%- if message -%}
+<div id="{{message.ID}}" {{Class(message)}} {{Style(message)}}>{{message.TEXT}}</div>
+{%- endif -%}
+{%- endmacro %}
+
+<!-- Tabs-->
+{% macro __Tab(tabs) -%}
+<div id="{{tabs.ID}}" class="mdl-tabs mdl-js-tabs -mdl-js-ripple-effect" {{Style(tabs)}} {{Events}}>
+<div class="mdl-tabs__tab-bar" style='justify-content: flex-start'>
+{% for i in tabs.WIDGETS -%}
+{%- if i.ACTIVE -%}
+<a href="#{{i.ID}}" class="mdl-tabs__tab is-active" style="text-decoration: none" {{Events(i)}}>{{i.TEXT}}</a>
+{%- else -%}
+<a href="#{{i.ID}}" class="mdl-tabs__tab" style="text-decoration: none" {{Events(i)}}>{{i.TEXT}}</a>
+{%- endif -%}
+{%- endfor %}
+</div>
+</div>
+{%- endmacro %}
+
+<!-- Href -->
+{% macro Href(e) -%}
+{%- if e.NEW_WINDOW -%}
+<a href="{{e.URL}}" target="_blank" {{Class(e)}} {{Style(e)}}> {{e.TEXT}} </a>
+{%- else -%}
+<a href="{{e.URL}}" {{Class(e)}} {{Style(e)}}> {{e.TEXT}} </a>
+{%- endif -%}
+{%- endmacro %}
+
+<!-- TextBlock -->
+{% macro TextBlock(text_block) -%}
+<div id="{{text_block.ID}}" {{Class(text_block)}} {{Style(text_block)}}>
+{%- if text_block.HEADER %}
+<h5> {{text_block.HEADER}}</h5>
+{%- endif %}
+{%- for p in text_block.PARAGRAPHS -%}
+  <div {{Style(p)}} {{Class(p)}}>
+  {%- for ph in p.PHRASES -%}
+  {%- if ph.WIDGET_TYPE == 'Href' -%}
+    {{Href(ph)}}
+  {%- elif ph.GLIF -%}
+  <span class="fas fa-{{ph.GLIF}} {{ph.CLASS}}" style="{{ph.STYLE}}"></span>
+  {%- elif ph.WIDGET_TYPE -%}
+  {{Widget(ph)}}
+  {%- else -%}
+  {{ph.TEXT | safe}}
+  {%- endif %}
+  {%- endfor %}
+  </div>
+{%- endfor %}
+</div>
+{%- endmacro %}
+
+{%- macro Colspan(cell) -%}
+{%- if cell.COLSPAN -%}
+ colspan = {{cell.COLSPAN}}
+{%- endif -%}
+{%- endmacro-%}
+
+<!-- TableCell -->
+{% macro TableRowCell(cell) -%}
+<td {{Class(cell)}} {{Style(cell)}} {{Events(cell)}} {{Tooltip(cell)}}>
+{%- if cell.HREF %}
+{{Href(cell.HREF)}}
+{%- elif cell.IMAGE -%}
+<img height="12" width="12" src="{{cell.IMAGE}}" />
+{%- elif cell.HTML -%}
+{{cell.HTML|safe}}
+{%- else -%}
+{{cell.TEXT}}
+{%- endif -%}
+{%- for wg in cell.WIDGETS -%}
+{{ Widget(wg) }}
+{%- endfor -%}
+</td>
+{%- endmacro %}
+
+<!-- TableRow -->
+{% macro TableRow(row) -%}
+<tr id="{{row.ID}}" {{Class(row)}} {{Style(row)}} {{Events(row)}}> 
+{% for field in row.FIELDS -%}
+{{ TableRowCell(field) }}
+{%- endfor %}
+</tr>
+{%- endmacro %}
+
+<!-- Width -->
+{%- macro Width(column) -%}
+{%- if column.WIDTH -%}
+width={{column.WIDTH}}
+{%- endif -%}
+{%- endmacro -%}
+
+<!-- Table -->
+{% macro Table(table) -%}
+<table id="{{table.ID}}" class="table {{table.CLASS}}" {{Style(table)}}>
+{{table.COLUMNS_HTML() | safe}}
+<tbody id="{{table.TBODY.ID}}">
+{% for row in table.ROWS %}
+{{ TableRow(row) }}
+{% endfor %}
+</tbody>
+</table>
+{%- endmacro %}
+
+{%- macro Pattern(e) -%}
+{%- if e.PATTERN -%}
+pattern="{{e.PATTERN}}"
+{%- endif -%}
+{%- endmacro -%}
+
+<!-- InputGroup 
+{% macro InputGroup(wg) -%}
+{%- if wg.LABEL -%}
+<div style='display:flex; flex-direction: column'>
+{%- if wg.LABEL != '-' -%}
+<div style="color:gray;font-size:0.8em; margin-bottom:0px">{{wg.LABEL}}</div>
+{%- endif -%}
+<div style="border-radius: 0.3rem; display:flex; flex-direction: row; align-items:center; border-style: solid; border-width: thin; border-color: lightgray; {{wg.STYLE}}">
+{%- if wg.TEXT -%}
+<div style='white-space:nowrap;color:gray;margin-left:0.5rem;'> {{wg.TEXT}} </div>
+{%- endif -%}
+{% for e in wg.ITEMS -%}
+{%- if e.WIDGET_TYPE == 'Input' -%}
+<input {{Tooltip(e)}} {{e.DISABLED}} x-webkit-speech {{Events(e)}} style="border-color:transparent; {{e.STYLE}}" {{Pattern(e)}} class="form-control {{e.CLASS}}" name="{{e.NAME}}" value="{{e.VALUE}}" type="{{e.INPUT_TYPE}}" placeholder="{{e.PLACEHOLDER}}"/>
+{% elif e.WIDGET_TYPE == 'Select' -%}
+<select style="margin-left:0.5rem; border-color:transparent; {{e.STYLE}}" id="{{e.ID}}" name="{{e.NAME}}" {{Class(e)}} {{Events(e)}}>
+<options>
+  {% for option in e.OPTIONS -%}
+  <option value="{{option.VALUE}}">{{option.TEXT}}</option>
+  {%- endfor %}
+</select>
+{% endif -%}
+{%- endfor %}
+{%- if wg.BUTTONS -%}
+{% for button in wg.BUTTONS -%}
+{{ Widget(button) }}
+{%- endfor %}
+{%- endif -%}
+</div>
+</div>
+{%- else -%}
+<div class="input-group {{wg.CLASS}}" id="{{wg.ID}}" {{Style(wg)}}>
+{%- if wg.TEXT -%}
+<div class="input-group-prepend"> <span class="input-group-text">{{wg.TEXT}}</span> </div>
+{%- endif -%}
+{% for i in wg.ITEMS -%}
+{{ Widget(i) }}
+{%- endfor %}
+{%- if wg.BUTTONS -%}
+<div class="input-group-append">
+{% for button in wg.BUTTONS -%}
+{{ Widget(button) }}
+{%- endfor %}
+</div>
+{%- endif -%}
+</div>
+{%- endif -%}
+{%- endmacro %}
+-->
+
+<!-- mdl_DropDown -->
+{% macro __mdl_DropDown(w) -%}
+<div  class="dropdown dropbottom">
+<button type="button" class="btn dropdown-toggle {{w.CLASS}}"  {{Style(w)}} data-toggle="dropdown">{{w.TEXT}}</button>
+<div class="dropdown-menu">
+{% for i in w.WIDGETS -%}
+{%- if i.TEXT -%}
+<a class="dropdown-item {{i.CLASS}}" href="#" {{Style(i)}} {{Events(i)}}>{{i.TEXT}}</a>
+{%- else -%}
+<div class="dropdown-divider"></div>
+{%- endif -%}
+{% endfor %}
+</div>
+</div>
+{%- endmacro %}
+
+<!-- mdl_Button -->
+{%- macro __mdl_Button(button) -%}
+{%- if button.IS_DROPDOWN -%}
+{{mdl_DropDown(button)}}
+{%- else -%}
+  {%- if button.LABEL %}
+    <div style="display:flex; flex-direction: column">
+    <div style="color:gray;font-size:0.8em; margin-bottom:0px">{{button.LABEL}}</div>
+    <button {{Disabled(button)}} {{Tooltip(button)}} id="{{button.ID}}" {{Class(button)}} {{Events(button)}} {{Style(button)}}>
+    {{button.TEXT|safe}} 
+    {%- if button.GLIF -%}
+      <span class="fas fa-{{button.GLIF}} {{button.GLIF_CLASS}}" style="{{button.GLIF_STYLE}}"></span>
+    {%- endif -%}
+    </button>
+    </div>
+  {%- else -%}
+    <button {{Disabled(button)}} {{Tooltip(button)}} id="{{button.ID}}" {{Class(button)}} {{Events(button)}} {{Style(button)}}>
+    {{button.TEXT|safe}} 
+    {%- if button.GLIF -%}
+      <span class="fas fa-{{button.GLIF}} {{button.GLIF_CLASS}}" style="{{button.GLIF_STYLE}}"></span>
+    {%- endif -%}
+    </button>
+  {% endif -%}
+{%- endif -%}
+{%- endmacro -%}
+
+<!-- Button -->
+{%- macro __Button(button) -%}
+{%- if button.FRAMEWORK == 'MDL' -%}
+  {{mdl_Button(button)}}
+{%- else -%}
+<button {{Disabled(button)}} class="btn {{button.CLASS}}" {{Events(button)}} {{Style(button)}}>
+  {%- if button.GLIF -%}
+<span class="fas fa-{{button.GLIF}} {{button.GLIF_CLASS}}" style="{{button.GLIF_STYLE}}"></span>
+  {%- endif -%}
+{{button.TEXT|safe}} 
+</button>
+{%- endif -%}
+{%- endmacro -%}
+
+{% macro Widget(widget) -%}
+{%- if widget.WIDGET_TYPE == 'TextBlock' -%}
+{{ TextBlock(widget) }}
+{%- elif widget.WIDGET_TYPE == 'Header' -%}
+{{ Header(widget) }}
+{%- elif widget.WIDGET_TYPE == 'Table' -%}
+{{ Table(widget) }}
+{%- elif widget.WIDGET_TYPE == 'ButtonGroup' -%}
+{{widget.HTML()|safe}}
+{%- elif widget.WIDGET_TYPE == 'Button' -%}
+{{ widget.HTML()|safe}}
+{%- elif widget.WIDGET_TYPE == 'Input' -%}
+{{ widget.HTML()|safe }}
+{%- elif widget.WIDGET_TYPE == 'Select'-%}
+{{ widget.HTML() | safe}}
+{%- elif widget.WIDGET_TYPE == 'InputGroup_' -%}
+{{ InputGroup(widget) }}
+<!--{%- elif widget.WIDGET_TYPE == 'Glif' -%}
+{{widget.HTML()|safe}}
+{%- elif widget.WIDGET_TYPE == 'Tabs' -%}
+{{widget.HTML()|safe}}
+{%- elif widget.WIDGET_TYPE == 'Link' -%}
+{{widget.HTML()|safe}}
+-->
+{%- elif widget.WIDGET_TYPE == 'Toolbar' -%}
+{{ Toolbar(widget) }}
+{%- elif widget.WIDGET_TYPE == 'TextArea' -%}
+{{widget.HTML()|safe}}
+{%- elif widget.WIDGET_TYPE == 'DropDown' -%}
+{{ DropDown(widget) }}
+{%- elif widget.WIDGET_TYPE == 'IconButton' -%}
+{{widget.HTML()|safe }}
+{%- elif widget.WIDGET_TYPE == 'Panel' -%}
+{{Panel(widget)}}
+{%- else -%}
+{{widget.HTML()|safe }}
+{%- endif -%}
+{% endmacro %}
+
